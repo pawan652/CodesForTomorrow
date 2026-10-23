@@ -1,0 +1,6 @@
+node_modules
+dist
+.env
+firebase-service-account.json
+*-firebase-adminsdk-*.json
+chat-app-19f6f-firebase-adminsdk-fbsvc-363d0dc65c.json

@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isChatMember(chatId) {
+      return isSignedIn()
+        && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.memberIds;
+    }
+
+    match /chats/{chatId} {
+      allow read: if isSignedIn() && request.auth.uid in resource.data.memberIds;
+      allow write: if false;
+
+      match /messages/{messageId} {
+        allow read: if isChatMember(chatId);
+        allow write: if false;
+      }
+
+      match /lastSeen/{userId} {
+        allow read: if isChatMember(chatId) && request.auth.uid == userId;
+        allow write: if false;
+      }
+    }
+  }
+}
